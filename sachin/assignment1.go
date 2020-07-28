@@ -3,31 +3,35 @@ package main
 import (
 	"bufio"
 	"context"
-	"flag"
+	//"flag"
 	"fmt"
 	"os"
-	"path/filepath"
+	//"path/filepath"
 
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
+	//"k8s.io/client-go/util/homedir"
 	"k8s.io/client-go/util/retry"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func main() {
-	var kubeconfig *string
+	/*var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
-	flag.Parse()
+	flag.Parse()*/
+	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+	configOverrides := &clientcmd.ConfigOverrides{}
+	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
 
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	//config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	config, err := kubeConfig.ClientConfig()
 	if err != nil {
 		panic(err)
 	}
