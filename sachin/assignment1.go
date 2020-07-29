@@ -16,6 +16,8 @@ import (
 	//"k8s.io/client-go/util/homedir"
 	"k8s.io/client-go/util/retry"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	config_cr "sigs.k8s.io/controller-runtime/pkg/client/config"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func main() {
@@ -322,6 +324,104 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Deleted Namespace")
+
+	// Using controller-runtime client
+	prompt()
+	fmt.Println("Client-go work has been finished here, will start with controller-runtime client")
+	fmt.Println("Listing out all the pods in sachin namespace")
+	cl, err := client.New(config_cr.GetConfigOrDie(), client.Options{})
+	if err != nil{
+		panic(err)
+	}
+	podList := &apiv1.PodList{}
+	err = cl.List(context.Background(), podList, client.InNamespace("sachin"))
+	if err != nil{
+		panic(err)
+	}
+
+	for _, pdl := range podList.Items {
+                fmt.Printf(" * %s \n", pdl.Name)
+        }
+
+	// Creating a deployment using controller-runtime client
+	prompt()
+	fmt.Println("Creating Deployment using controller-runtime client")
+	deployment = &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "demo-deployment",
+			Namespace: "sachin",
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: int32Ptr(2),
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{"app": "demo",},
+			},
+			Template: apiv1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"app": "demo",},
+				},
+				Spec: apiv1.PodSpec{
+					Containers: []apiv1.Container{
+						{
+							Name:  "web",
+							Image: "nginx:1.12",
+							Ports: []apiv1.ContainerPort{
+								{
+									Name:          "http",
+									Protocol:      apiv1.ProtocolTCP,
+									ContainerPort: 80,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	err = cl.Create(context.Background(), deployment)
+	if err != nil{
+		panic(err)
+	}
+
+	fmt.Println("Deployment created using controller-runtime in namespace sachin")
+
+	// listing out all the deployments in sachin namespace
+	prompt()
+	fmt.Println("Listing out all the deployments in sachin namespace.")
+
+	deploymentList := &appsv1.DeploymentList{}
+	err = cl.List(context.Background(), deploymentList, client.InNamespace("sachin"))
+	if err != nil{
+		panic(err)
+	}
+
+	for _, dpl := range deploymentList.Items {
+                fmt.Printf(" * %s \n", dpl.Name)
+        }
+
+	// Deleting the last created deployment from sachin namespace
+	prompt()
+	fmt.Println("Deleting the last created deployment from sachin namespace")
+	err = cl.Delete(context.Background(), deployment)
+	if err != nil{
+		panic(err)
+	}
+
+	// listing out all the deployments in sachin namespace
+	prompt()
+	fmt.Println("Listing out all the deployments in sachin namespace.")
+
+	deploymentList = &appsv1.DeploymentList{}
+	err = cl.List(context.Background(), deploymentList, client.InNamespace("sachin"))
+	if err != nil{
+		panic(err)
+	}
+
+	for _, dpl := range deploymentList.Items {
+                fmt.Printf(" * %s \n", dpl.Name)
+        }
+
 
 }
 
