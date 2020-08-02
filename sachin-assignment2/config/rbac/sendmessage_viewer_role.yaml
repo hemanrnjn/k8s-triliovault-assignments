@@ -1,0 +1,20 @@
+# permissions for end users to view sendmessages.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sendmessage-viewer-role
+rules:
+- apiGroups:
+  - sendmessage.sendmessage.io
+  resources:
+  - sendmessages
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - sendmessage.sendmessage.io
+  resources:
+  - sendmessages/status
+  verbs:
+  - get

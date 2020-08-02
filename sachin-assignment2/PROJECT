@@ -1,0 +1,7 @@
+domain: sendmessage.io
+repo: sendmessage/io/m
+resources:
+- group: sendmessage
+  kind: SendMessage
+  version: v1
+version: "2"

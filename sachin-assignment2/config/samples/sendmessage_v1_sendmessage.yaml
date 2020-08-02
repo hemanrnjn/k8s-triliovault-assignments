@@ -1,0 +1,11 @@
+apiVersion: sendmessage.sendmessage.io/v1
+kind: SendMessage
+metadata:
+  name: sendmessage-sample
+spec:
+  # Add fields here
+  message: "This is a sample of message."
+  messageCarrier: "whatsapp"
+  CarrierToken: "testtoken"
+status:
+  status: ""
