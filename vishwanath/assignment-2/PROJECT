@@ -1,0 +1,10 @@
+domain: tutorial.kubebuilder.io
+repo: project
+resources:
+- group: batch
+  kind: CronJob
+  version: v1
+- group: batch
+  kind: CronJob
+  version: v2
+version: "2"
