@@ -1,66 +1,74 @@
 package clientgo
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
+	k8syaml "k8s.io/apimachinery/pkg/util/yaml"
 )
 
-func PodOps(clientset kubernetes.Clientset) {
+func PodOps() {
+	clientset := getClientSet(false)
+	podsClient := clientset.CoreV1().Pods("himanshu")
 
-	podsClient := clientset.CoreV1().Pods(apiv1.NamespaceDefault)
-
-	bytes, err := ioutil.ReadFile("../sample/pod.yaml")
+	fileBytes, err := ioutil.ReadFile("../../himanshu/assignment1/sample/pod.yaml")
 	if err != nil {
 		panic(err.Error())
 	}
 
 	var podSpec apiv1.Pod
-	err = yaml.Unmarshal(bytes, &podSpec)
-	if err != nil {
-		panic(err.Error())
+	dec := k8syaml.NewYAMLOrJSONDecoder(bytes.NewReader([]byte(string(fileBytes))), 1000)
+
+	if err := dec.Decode(&podSpec); err != nil {
+		panic(err)
 	}
 
 	// Create Pod
 	fmt.Println("Creating pod...")
-	result, err := podsClient.Create(&podSpec)
+	result, err := podsClient.Create(context.TODO(), &podSpec, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Created pod %q.\n", result.GetObjectMeta().GetName())
 
-	// List Pods
-	fmt.Printf("Listing pods in namespace %q:\n", apiv1.NamespaceDefault)
-	list, err := podsClient.List(metav1.ListOptions{})
-	if err != nil {
-		panic(err)
-	}
-	for _, d := range list.Items {
-		fmt.Printf(" * %s \n", d.Name)
-	}
-
-	// Updating Pod
-	fmt.Printf("Updating pod in namespace %q:\n", apiv1.NamespaceDefault)
-	result, getErr := podsClient.Get("demo-pod", metav1.GetOptions{})
+	// Get Pod
+	fmt.Printf("Getting pod in namespace %q:\n", "himanshu")
+	result, getErr := podsClient.Get(context.TODO(), "demo-pod", metav1.GetOptions{})
 	if getErr != nil {
 		panic(fmt.Errorf("Failed to get latest version of Pod: %v", getErr))
 	}
+	fmt.Printf("Latest Pod: %s \n", result.Name)
 
+	// Updating Pod
+	fmt.Printf("Updating pod in namespace %q:\n", "himanshu")
 	result.Spec.Containers[0].Image = "nginx:1.13" // change nginx version
-	_, updateErr := podsClient.Update(result)
+	_, updateErr := podsClient.Update(context.TODO(), result, metav1.UpdateOptions{})
 	if updateErr != nil {
-		panic(err)
+		panic(updateErr)
 	}
 	fmt.Println("Updated pod...")
 
+	// Verifying Update
+	fmt.Println("Verifying Update...")
+	result, getErr = podsClient.Get(context.TODO(), "demo-pod", metav1.GetOptions{})
+	if getErr != nil {
+		panic(fmt.Errorf("Failed to get latest version of Pod: %v", getErr))
+	}
+	if result.Spec.Containers[0].Image == "nginx:1.13" {
+		fmt.Println("Verified Successfully")
+	} else {
+		panic(fmt.Errorf("Verification failed. Image found %s, expected: nginx:1.13",
+			result.Spec.Containers[0].Image))
+	}
+
 	// Delete Pods
-	fmt.Printf("Deleting pod in namespace %q:\n", apiv1.NamespaceDefault)
+	fmt.Printf("Deleting pod in namespace %q:\n", "himanshu")
 	deletePolicy := metav1.DeletePropagationForeground
-	deleteErr := podsClient.Delete("demo-pod", &metav1.DeleteOptions{
+	deleteErr := podsClient.Delete(context.TODO(), "demo-pod", metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	})
 	if deleteErr != nil {

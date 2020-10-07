@@ -2,8 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: demo-pod
-  labels:
-    name: demo-nginx
+  namespace: himanshu
 spec:
   containers:
   - name: nginx

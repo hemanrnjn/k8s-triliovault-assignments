@@ -1,50 +1,25 @@
 package main
 
 import (
-	"flag"
-	"path/filepath"
-
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
-
-	client "github.com/hemanrnjn/k8s-triliovault-assignments/himanshu/assignment1/clientgo"
+	"fmt"
+	"github.com/hemanrnjn/k8s-triliovault-assignments/himanshu/assignment1/clientgo"
+	"github.com/hemanrnjn/k8s-triliovault-assignments/himanshu/assignment1/controller"
+	"time"
 )
 
 func main() {
+	fmt.Println("Executing client-go operations...")
+	clientgo.DeployOps()
+	clientgo.PodOps()
+	clientgo.SecretOps()
+	fmt.Println("client-go operations completed")
 
-	// Using kube congig, uncomment for testing locally:
-	var kubeconfig *string
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
+	fmt.Println("Sleeping for 1 min to finish termination of previous resources..")
+	time.Sleep(time.Minute * 1)
 
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		panic(err)
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err)
-	}
-
-	// Creates the in-cluster config
-	// config, err := rest.InClusterConfig()
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-
-	// // creates the clientset
-	// clientset, err := kubernetes.NewForConfig(config)
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-
-	// client.DeployOps(*clientset)
-	// client.PodOps(*clientset)
-	client.SecretOps(*clientset)
+	fmt.Println("Executing controller-runtime operations...")
+	controller.DeployOps()
+	controller.PodOps()
+	controller.SecretOps()
+	fmt.Println("controller-runtime operations completed")
 }
