@@ -12,12 +12,15 @@ import (
 )
 
 func PodOps() {
-	clientset := getClientSet(false)
+	clientset := getClientSet(true)
 	podsClient := clientset.CoreV1().Pods("himanshu")
 
 	fileBytes, err := ioutil.ReadFile("../../himanshu/assignment1/sample/pod.yaml")
 	if err != nil {
-		panic(err.Error())
+		fileBytes, err = ioutil.ReadFile("sample/pod.yaml")
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	var podSpec apiv1.Pod

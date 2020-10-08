@@ -26,7 +26,10 @@ func DeployOps() {
 
 	fileBytes, err := ioutil.ReadFile("../../himanshu/assignment1/sample/deployment.yaml")
 	if err != nil {
-		panic(err.Error())
+		fileBytes, err = ioutil.ReadFile("sample/deployment.yaml")
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	// Create Deployment

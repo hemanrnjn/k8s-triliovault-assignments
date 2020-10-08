@@ -16,12 +16,15 @@ func int32Ptr(i int32) *int32 {
 }
 
 func DeployOps() {
-	clientset := getClientSet(false)
+	clientset := getClientSet(true)
 	deploymentsClient := clientset.AppsV1().Deployments("himanshu")
 
 	fileBytes, err := ioutil.ReadFile("../../himanshu/assignment1/sample/deployment.yaml")
 	if err != nil {
-		panic(err.Error())
+		fileBytes, err = ioutil.ReadFile("sample/deployment.yaml")
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	var deploymentSpec appsv1.Deployment

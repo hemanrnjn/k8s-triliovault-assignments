@@ -22,7 +22,10 @@ func SecretOps() {
 
 	fileBytes, err := ioutil.ReadFile("../../himanshu/assignment1/sample/secret.yaml")
 	if err != nil {
-		panic(err.Error())
+		fileBytes, err = ioutil.ReadFile("sample/secret.yaml")
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	// Create Secret

@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: assign1-job
+  namespace: himanshu
+spec:
+  template:
+    spec:
+      containers:
+        - name: golang
+          image: hemanrnjn/trilio-assign1:latest
+          command: ["./main"]
+      restartPolicy: Never
+  backoffLimit: 4

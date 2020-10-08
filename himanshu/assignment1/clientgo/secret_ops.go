@@ -12,12 +12,15 @@ import (
 )
 
 func SecretOps() {
-	clientset := getClientSet(false)
+	clientset := getClientSet(true)
 	secretClient := clientset.CoreV1().Secrets("himanshu")
 
 	fileBytes, err := ioutil.ReadFile("../../himanshu/assignment1/sample/secret.yaml")
 	if err != nil {
-		panic(err.Error())
+		fileBytes, err = ioutil.ReadFile("sample/secret.yaml")
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	var secretSpec corev1.Secret

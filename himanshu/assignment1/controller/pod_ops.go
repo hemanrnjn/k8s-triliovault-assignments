@@ -22,7 +22,10 @@ func PodOps() {
 
 	fileBytes, err := ioutil.ReadFile("../../himanshu/assignment1/sample/pod.yaml")
 	if err != nil {
-		panic(err.Error())
+		fileBytes, err = ioutil.ReadFile("sample/pod.yaml")
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	// Create Pod
