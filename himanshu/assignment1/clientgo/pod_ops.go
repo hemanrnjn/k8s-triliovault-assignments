@@ -42,6 +42,7 @@ func PodOps() {
 	fmt.Printf("Getting pod in namespace %q:\n", "himanshu")
 	result, getErr := podsClient.Get(context.TODO(), "demo-pod", metav1.GetOptions{})
 	if getErr != nil {
+		cleanUpClientGoResources("pod")
 		panic(fmt.Errorf("Failed to get latest version of Pod: %v", getErr))
 	}
 	fmt.Printf("Latest Pod: %s \n", result.Name)
@@ -51,6 +52,7 @@ func PodOps() {
 	result.Spec.Containers[0].Image = "nginx:1.13" // change nginx version
 	_, updateErr := podsClient.Update(context.TODO(), result, metav1.UpdateOptions{})
 	if updateErr != nil {
+		cleanUpClientGoResources("pod")
 		panic(updateErr)
 	}
 	fmt.Println("Updated pod...")
@@ -59,11 +61,13 @@ func PodOps() {
 	fmt.Println("Verifying Update...")
 	result, getErr = podsClient.Get(context.TODO(), "demo-pod", metav1.GetOptions{})
 	if getErr != nil {
+		cleanUpClientGoResources("pod")
 		panic(fmt.Errorf("Failed to get latest version of Pod: %v", getErr))
 	}
 	if result.Spec.Containers[0].Image == "nginx:1.13" {
 		fmt.Println("Verified Successfully")
 	} else {
+		cleanUpClientGoResources("pod")
 		panic(fmt.Errorf("Verification failed. Image found %s, expected: nginx:1.13",
 			result.Spec.Containers[0].Image))
 	}

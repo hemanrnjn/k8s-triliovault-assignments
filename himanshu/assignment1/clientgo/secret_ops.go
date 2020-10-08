@@ -42,6 +42,7 @@ func SecretOps() {
 	fmt.Printf("Getting secret in namespace %q:\n", "himanshu")
 	result, getErr := secretClient.Get(context.TODO(), "demo-secret", metav1.GetOptions{})
 	if getErr != nil {
+		cleanUpClientGoResources("secret")
 		panic(fmt.Errorf("Failed to get latest version of Secret: %v", getErr))
 	}
 	fmt.Printf("Latest Secret: %s \n", result.Name)
@@ -51,6 +52,7 @@ func SecretOps() {
 	result.Data["username"] = []byte("bXktc2VjcmV0LWFwcA==") // change username
 	_, updateErr := secretClient.Update(context.TODO(), result, metav1.UpdateOptions{})
 	if updateErr != nil {
+		cleanUpClientGoResources("secret")
 		panic(updateErr)
 	}
 	fmt.Println("Updated secret...")
@@ -59,11 +61,13 @@ func SecretOps() {
 	fmt.Println("Verifying Update...")
 	result, getErr = secretClient.Get(context.TODO(), "demo-secret", metav1.GetOptions{})
 	if getErr != nil {
+		cleanUpClientGoResources("secret")
 		panic(fmt.Errorf("Failed to get latest version of Secret: %v", getErr))
 	}
 	if bytes.Compare(result.Data["username"], []byte("bXktc2VjcmV0LWFwcA==")) == 0 {
 		fmt.Println("Verified Successfully")
 	} else {
+		cleanUpClientGoResources("secret")
 		panic(fmt.Errorf("Verification failed. Secret found: %b, expected %b", result.Data["username"],
 			[]byte("bXktc2VjcmV0LWFwcA==")))
 	}

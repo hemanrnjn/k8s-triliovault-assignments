@@ -50,6 +50,7 @@ func SecretOps() {
 		Namespace: "himanshu",
 		Name:      "demo-secret",
 	}, &secret); err != nil {
+		cleanUpControllerResources("secret", secretSpec)
 		panic(fmt.Errorf("Failed to get Secret: %v", err))
 	}
 	fmt.Printf("Latest Secret: %s \n", secret.Name)
@@ -59,6 +60,7 @@ func SecretOps() {
 	secret.Data["username"] = []byte("bXktc2VjcmV0LWFwcA==") // change username
 	err = cl.Update(context.Background(), &secret)
 	if err != nil {
+		cleanUpControllerResources("secret", secret)
 		panic(err)
 	}
 	fmt.Println("Updated secret...")
@@ -69,11 +71,13 @@ func SecretOps() {
 		Namespace: "himanshu",
 		Name:      "demo-secret",
 	}, &secret); err != nil {
+		cleanUpControllerResources("secret", secret)
 		panic(fmt.Errorf("Failed to get Secret: %v", err))
 	}
 	if bytes.Compare(secret.Data["username"], []byte("bXktc2VjcmV0LWFwcA==")) == 0 {
 		fmt.Println("Verified Successfully")
 	} else {
+		cleanUpControllerResources("secret", secret)
 		panic(fmt.Errorf("Verification failed. Secret found: %b, expected %b", secret.Data["username"],
 			[]byte("bXktc2VjcmV0LWFwcA==")))
 	}

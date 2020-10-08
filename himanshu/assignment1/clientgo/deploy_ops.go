@@ -46,6 +46,7 @@ func DeployOps() {
 	fmt.Printf("Getting deployment in namespace %q:\n", "himanshu")
 	result, getErr := deploymentsClient.Get(context.TODO(), "demo-deploy", metav1.GetOptions{})
 	if getErr != nil {
+		cleanUpClientGoResources("deploy")
 		panic(fmt.Errorf("Failed to get latest version of Deployment: %v", getErr))
 	}
 	fmt.Printf("Latest Deployment: %s with (%d replicas)\n", result.Name, *result.Spec.Replicas)
@@ -55,6 +56,7 @@ func DeployOps() {
 	result.Spec.Template.Spec.Containers[0].Image = "nginx:1.13" // change nginx version
 	_, updateErr := deploymentsClient.Update(context.TODO(), result, metav1.UpdateOptions{})
 	if updateErr != nil {
+		cleanUpClientGoResources("deploy")
 		panic(updateErr)
 	}
 	fmt.Println("Updated deployment...")
@@ -63,11 +65,13 @@ func DeployOps() {
 	fmt.Println("Verifying Update...")
 	result, getErr = deploymentsClient.Get(context.TODO(), "demo-deploy", metav1.GetOptions{})
 	if getErr != nil {
+		cleanUpClientGoResources("deploy")
 		panic(fmt.Errorf("Failed to get latest version of Deployment: %v", getErr))
 	}
 	if *result.Spec.Replicas == 2 && result.Spec.Template.Spec.Containers[0].Image == "nginx:1.13" {
 		fmt.Println("Verified Successfully")
 	} else {
+		cleanUpClientGoResources("deploy")
 		panic(fmt.Errorf("Verification failed. Replicas found: %d, expected 2 and Image found %s, expected: nginx:1.13",
 			*result.Spec.Replicas, result.Spec.Template.Spec.Containers[0].Image))
 	}

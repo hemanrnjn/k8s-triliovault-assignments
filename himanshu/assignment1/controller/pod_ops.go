@@ -50,6 +50,7 @@ func PodOps() {
 		Namespace: "himanshu",
 		Name:      "demo-pod",
 	}, &pod); err != nil {
+		cleanUpControllerResources("pod", podSpec)
 		panic(fmt.Errorf("Failed to get latest version of Pod: %v", err))
 	}
 	fmt.Printf("Latest Pod: %s \n", pod.Name)
@@ -59,6 +60,7 @@ func PodOps() {
 	pod.Spec.Containers[0].Image = "nginx:1.13" // change nginx version
 	err = cl.Update(context.Background(), &pod)
 	if err != nil {
+		cleanUpControllerResources("pod", pod)
 		panic(err)
 	}
 	fmt.Println("Updated pod...")
@@ -69,11 +71,13 @@ func PodOps() {
 		Namespace: "himanshu",
 		Name:      "demo-pod",
 	}, &pod); err != nil {
+		cleanUpControllerResources("pod", pod)
 		panic(fmt.Errorf("Failed to get latest version of Pod: %v", err))
 	}
 	if pod.Spec.Containers[0].Image == "nginx:1.13" {
 		fmt.Println("Verified Successfully")
 	} else {
+		cleanUpControllerResources("pod", pod)
 		panic(fmt.Errorf("Verification failed. Image found %s, expected: nginx:1.13",
 			pod.Spec.Containers[0].Image))
 	}

@@ -1,6 +1,9 @@
 package clientgo
 
 import (
+	"context"
+	"fmt"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -42,4 +45,37 @@ func getClientSet(inCluster bool) *kubernetes.Clientset {
 		panic(err)
 	}
 	return clientset
+}
+
+func cleanUpClientGoResources(resource string) {
+	fmt.Println("Cleaning up client-go resources..")
+	if resource == "deploy" {
+		client := getClientSet(true).AppsV1().Deployments("himanshu")
+		deletePolicy := metav1.DeletePropagationForeground
+		deleteErr := client.Delete(context.TODO(), "demo-deploy", metav1.DeleteOptions{
+			PropagationPolicy: &deletePolicy,
+		})
+		if deleteErr != nil {
+			panic(deleteErr)
+		}
+	} else if resource == "pod" {
+		client := getClientSet(true).CoreV1().Pods("himanshu")
+		deletePolicy := metav1.DeletePropagationForeground
+		deleteErr := client.Delete(context.TODO(), "demo-pod", metav1.DeleteOptions{
+			PropagationPolicy: &deletePolicy,
+		})
+		if deleteErr != nil {
+			panic(deleteErr)
+		}
+	} else {
+		client := getClientSet(true).CoreV1().Secrets("himanshu")
+		deletePolicy := metav1.DeletePropagationForeground
+		deleteErr := client.Delete(context.TODO(), "demo-secret", metav1.DeleteOptions{
+			PropagationPolicy: &deletePolicy,
+		})
+		if deleteErr != nil {
+			panic(deleteErr)
+		}
+	}
+	fmt.Println("Cleaned up client-go resources..")
 }

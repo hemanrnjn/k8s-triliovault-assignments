@@ -53,6 +53,7 @@ func DeployOps() {
 		Namespace: "himanshu",
 		Name:      "demo-deploy",
 	}, &deploy); err != nil {
+		cleanUpControllerResources("deploy", deploymentSpec)
 		panic(fmt.Errorf("Failed to get latest version of Deployment: %v", err))
 	}
 	fmt.Printf("Latest Deployment: %s with (%d replicas)\n", deploy.Name, *deploy.Spec.Replicas)
@@ -63,6 +64,7 @@ func DeployOps() {
 	deploy.Spec.Template.Spec.Containers[0].Image = "nginx:1.13"
 	err = cl.Update(context.Background(), &deploy)
 	if err != nil {
+		cleanUpControllerResources("deploy", deploy)
 		panic(err)
 	}
 	fmt.Println("Updated deployment...")
@@ -73,11 +75,13 @@ func DeployOps() {
 		Namespace: "himanshu",
 		Name:      "demo-deploy",
 	}, &deploy); err != nil {
+		cleanUpControllerResources("deploy", deploy)
 		panic(fmt.Errorf("Failed to get latest version of Deployment: %v", err))
 	}
 	if *deploy.Spec.Replicas == 2 && deploy.Spec.Template.Spec.Containers[0].Image == "nginx:1.13" {
 		fmt.Println("Verified Successfully")
 	} else {
+		cleanUpControllerResources("deploy", deploy)
 		panic(fmt.Errorf("Verification failed. Replicas found: %d, expected 2 and Image found %s, expected: nginx:1.13",
 			*deploy.Spec.Replicas, deploy.Spec.Template.Spec.Containers[0].Image))
 	}
