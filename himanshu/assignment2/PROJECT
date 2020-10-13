@@ -1,0 +1,7 @@
+domain: hemanrnjn.io
+repo: training
+resources:
+- group: myapp
+  kind: DBCluster
+  version: v1
+version: "2"

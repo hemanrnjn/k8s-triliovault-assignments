@@ -1,0 +1,9 @@
+apiVersion: myapp.hemanrnjn.io/v1
+kind: DBCluster
+metadata:
+  name: dbcluster-sample
+spec:
+  # Add fields here
+  type: Mongo
+status:
+  status: Active
